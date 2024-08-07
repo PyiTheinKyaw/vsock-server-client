@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/pyitheinkyaw/vsock"
-
 	"os"
 	"strconv"
+
+	"github.com/pyitheinkyaw/vsock"
+	"github.com/joho/godotenv"
 )
+
+const PORT = 9999
 
 func serverHandler(port uint32) {
 
@@ -16,7 +19,6 @@ func serverHandler(port uint32) {
 	if err != nil {
 		log.Fatalf("Failed to create socket: %v", err)
 	}
-	defer vsock.Close(fd)
 
 	addr := &vsock.SockaddrVM{CID: vsock.VMADDR_CID_ANY, Port: port}
 	err = vsock.Bind(fd, addr)
@@ -28,6 +30,8 @@ func serverHandler(port uint32) {
 	if err != nil {
 		log.Fatalf("Failed to listen on socket: %v", err)
 	}
+
+	defer vsock.Close(fd)
 
 	contextId, ctx_err := vsock.ContextID()
 	if ctx_err != nil {
@@ -47,7 +51,7 @@ func serverHandler(port uint32) {
 }
 
 func handleConnection(fd int) {
-	defer vsock.Close(fd)
+	//defer vsock.Close(fd)
 	for {
 		buf, err := vsock.Recv(fd)
 		if err != nil {
@@ -62,17 +66,22 @@ func handleConnection(fd int) {
 }
 
 func main() {
-	// Check if the correct number of arguments is provided
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: ./server <port>")
-		os.Exit(1)
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Can't find .env file, use default value", PORT)
 	}
 
-	// Parse the Port argument
-	port, err := strconv.ParseUint(os.Args[1], 10, 32)
-	if err != nil {
-		fmt.Printf("Error parsing Port: %v\n", err)
-		os.Exit(1)
+	portStr := os.Getenv("PORT")
+	port := PORT
+
+	if portStr != "" {
+		var err error
+		port, err = strconv.Atoi(portStr)
+		if err != nil {
+			fmt.Println("Invalid port number:", err)
+			return
+		}
 	}
 
 	// Call your server handler function with the parsed arguments

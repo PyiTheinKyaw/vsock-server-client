@@ -11,20 +11,24 @@ all: build
 # Build the Go binary for SERVER
 build-server:
 	@echo "Building the Go binary for server..."
-	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_SERVER) ./server
+	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_SERVER) ./src/server
 
 build-server-pt:
 	@echo "Building Portalbe server directly using golang.org/x/sys/unix"
-	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_SERVER_PT) ./serverpt
+	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_SERVER_PT) ./src/serverpt
 
 # Build the Go binary for Client
 build-client:
 	@echo "Building the Go binary for client..."
-	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_CLIENT) ./client
+	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_CLIENT) ./src/client
 
 build-client-pt:
 	@echo "Building Portalbe client directly using golang.org/x/sys/unix"
-	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_CLIENT_PT) ./clientpt
+	go build -o $(CURRENT_DIR)/bin/$(BINARY_NAME_CLIENT_PT) ./src/clientpt
+
+clean:
+	@echo "Clean bin folder"
+	rm -rf bin/*
 
 # Build both applications
 build: build-server build-server-pt build-client build-client-pt

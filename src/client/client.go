@@ -10,14 +10,14 @@ import (
 	"strconv"
 )
 
-func clientHandler(cid uint32, port uint32) {
+func clientHandler(cid uint32, port uint32, msg string) {
 	serverCID := cid
 
 	fd, err := vsock.Socket()
 	if err != nil {
 		log.Fatalf("Failed to create socket: %v", err)
 	}
-	defer vsock.Close(fd)
+	// defer vsock.Close(fd)
 
 	addr := &vsock.SockaddrVM{CID: serverCID, Port: port}
 	err = vsock.Connect(fd, addr)
@@ -25,18 +25,18 @@ func clientHandler(cid uint32, port uint32) {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 
-	msg := "Hello, world!"
 	err = vsock.Send(fd, []byte(msg))
 	if err != nil {
 		log.Fatalf("Failed to send data: %v", err)
 	}
 	fmt.Println("Message sent.")
+	// defer vsock.Close(fd)
 }
 
 func main() {
 	// Check if the correct number of arguments is provided
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: ./client <cid> <port>")
+	if len(os.Args) != 4 {
+		fmt.Println("Usage: ./client <cid> <port> <message>")
 		os.Exit(1)
 	}
 
@@ -60,5 +60,5 @@ func main() {
 	fmt.Printf("Port: %d\n", port)
 
 	// Call your server handler function with the parsed arguments
-	clientHandler(uint32(cid), uint32(port))
+	clientHandler(uint32(cid), uint32(port), os.Args[3])
 }

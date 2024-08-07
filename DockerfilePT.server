@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOOS=linux make build-server-pt
 
 FROM kmstool-enclave-cli as build-stage-2
 
-COPY --from=build-stage-1 /app/bin/serverpt /app/serverpt 
+COPY --from=build-stage-1 /app/bin/serverpt /app/server
 
 COPY --from=kmstool-enclave-cli /kmstool_enclave_cli /app/
 
@@ -40,4 +40,4 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app
 COPY --from=build-stage-2 /app /app
 
 # Command to run the executable
-CMD ["./app/serverpt"]
+CMD ["./app/server"]
